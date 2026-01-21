@@ -1,0 +1,13 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+.terraform.lock.hcl
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+lambda-function/*.zip
+.env
