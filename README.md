@@ -170,6 +170,26 @@ Contains actual values for variables.
 
 **Note:** This file is excluded from Git (may contain secrets).
 
+### outputs.tf
+Displays important information after deployment.
+
+![Outputs Configuration](screenshots/outputs-tf.png)
+
+**Configured outputs:**
+- `s3_bucket_name` - Bucket name for uploads
+- `s3_bucket_arn` - Unique bucket identifier
+- `lambda_function_name` - Lambda function name
+- `lambda_function_arn` - Lambda function ARN
+- `lambda_role_arn` - IAM role ARN
+- `cloudwatch_log_group` - Log group path
+- `upload_command_example` - Ready-to-use upload command
+
+**Why outputs matter:**
+- Quick reference to deployed resources
+- Copy-paste commands for testing
+- ARNs for permissions and integrations
+- Easy sharing with team members
+
 ### lambda_function.py
 The Python code that runs in Lambda.
 
