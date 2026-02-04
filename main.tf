@@ -1,10 +1,14 @@
+# ============================================================================
+# TERRAFORM AND PROVIDER CONFIGURATION
+# ============================================================================
+
 terraform {
   required_version = ">= 1.0"
-
+  
   required_providers {
     aws = {
-      source  = ""hashicorp/aws"
-      version = "~>5.0"
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
     }
   }
 }
@@ -21,13 +25,21 @@ provider "aws" {
   }
 }
 
+# ============================================================================
+# DATA SOURCES
+# ============================================================================
+
+# Get current AWS account ID
+data "aws_caller_identity" "current" {}
+
+# ============================================================================
+# S3 BUCKET AND CONFIGURATION
+# ============================================================================
+
 # Create S3 bucket that will trigger Lambda
 resource "aws_s3_bucket" "lambda_bucket" {
   bucket = "${var.project_name}-uploads-${data.aws_caller_identity.current.account_id}"
 }
-
-# Get current AWS account ID
-data "aws_caller_identity" "current" {}
 
 # Enable versioning for the bucket
 resource "aws_s3_bucket_versioning" "lambda_bucket_versioning" {
@@ -48,6 +60,10 @@ resource "aws_s3_bucket_public_access_block" "lambda_bucket_pab" {
   restrict_public_buckets = true
 }
 
+# ============================================================================
+# IAM ROLE AND POLICIES FOR LAMBDA
+# ============================================================================
+
 # IAM role for Lambda execution
 resource "aws_iam_role" "lambda_execution_role" {
   name = "${var.project_name}-lambda-execution-role"
@@ -66,9 +82,9 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 }
 
-#IAM policy for s3 access
+# IAM policy for S3 access
 resource "aws_iam_role_policy" "lambda_s3_policy" {
-  name = ${var.project_name}-lambda_s3_policy
+  name = "${var.project_name}-lambda-s3-policy"
   role = aws_iam_role.lambda_execution_role.id
 
   policy = jsonencode({
@@ -89,7 +105,7 @@ resource "aws_iam_role_policy" "lambda_s3_policy" {
       }
     ]
   })
-} 
+}
 
 # Attach AWS managed policy for CloudWatch Logs
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
@@ -97,11 +113,19 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+# ============================================================================
+# CLOUDWATCH LOGS
+# ============================================================================
+
 # CloudWatch Log Group for Lambda
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
   name              = "/aws/lambda/${var.lambda_function_name}"
   retention_in_days = 7
 }
+
+# ============================================================================
+# LAMBDA FUNCTION
+# ============================================================================
 
 # Lambda function
 resource "aws_lambda_function" "file_processor" {
@@ -121,7 +145,9 @@ resource "aws_lambda_function" "file_processor" {
   ]
 }
 
+# ============================================================================
 # S3 BUCKET NOTIFICATION (TRIGGER)
+# ============================================================================
 
 # Lambda permission for S3 to invoke the function
 resource "aws_lambda_permission" "allow_s3" {
