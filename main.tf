@@ -4,7 +4,7 @@
 
 terraform {
   required_version = ">= 1.0"
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -15,7 +15,7 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
-  
+
   default_tags {
     tags = {
       Project     = var.project_name
@@ -44,7 +44,7 @@ resource "aws_s3_bucket" "lambda_bucket" {
 # Enable versioning for the bucket
 resource "aws_s3_bucket_versioning" "lambda_bucket_versioning" {
   bucket = aws_s3_bucket.lambda_bucket.id
-  
+
   versioning_configuration {
     status = "Enabled"
   }
@@ -53,7 +53,7 @@ resource "aws_s3_bucket_versioning" "lambda_bucket_versioning" {
 # Block all public access
 resource "aws_s3_bucket_public_access_block" "lambda_bucket_pab" {
   bucket = aws_s3_bucket.lambda_bucket.id
-  
+
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -99,8 +99,8 @@ resource "aws_iam_role_policy" "lambda_s3_policy" {
         Resource = "${aws_s3_bucket.lambda_bucket.arn}/*"
       },
       {
-        Effect = "Allow"
-        Action = "s3:HeadObject"
+        Effect   = "Allow"
+        Action   = "s3:HeadObject"
         Resource = "${aws_s3_bucket.lambda_bucket.arn}/*"
       }
     ]
@@ -131,12 +131,12 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
 resource "aws_lambda_function" "file_processor" {
   filename         = "${path.module}/lambda-function/lambda_function.zip"
   function_name    = var.lambda_function_name
-  role            = aws_iam_role.lambda_execution_role.arn
-  handler         = "lambda_function.lambda_handler"
+  role             = aws_iam_role.lambda_execution_role.arn
+  handler          = "lambda_function.lambda_handler"
   source_code_hash = filebase64sha256("${path.module}/lambda-function/lambda_function.zip")
-  runtime         = var.lambda_runtime
-  timeout         = var.lambda_timeout
-  memory_size     = var.lambda_memory
+  runtime          = var.lambda_runtime
+  timeout          = var.lambda_timeout
+  memory_size      = var.lambda_memory
 
   depends_on = [
     aws_iam_role_policy.lambda_s3_policy,
