@@ -384,13 +384,22 @@ terraform output
 3. Execution role should be `lambda-execution-role`
 4. Click role to see policies
 
+### Verify CloudWatch Log Group
+![cloudwatch log group](screenshots/cloudwatch-log-group.png)
+
+**verify**
+Search for "CloudWatch"
+Click "CloudWatch" service
+Click "Logs" → "Log groups" in left sidebar
+Find: /aws/lambda/file-metadata-processor
+
 ## 🧪 Testing the Function
 
 ### Test 1: Upload Text File
 ![Upload Text File](screenshots/upload-text-file.png)
 ```bash
 # Create test file
-echo "Hello Lambda!" > test.txt
+echo "Hello from serverless Lambda!" > test.txt
 
 # Upload to S3
 aws s3 cp test.txt s3://lambda-serverless-uploads-{account-id}/
